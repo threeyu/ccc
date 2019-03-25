@@ -35,9 +35,9 @@ cc.Class({
 
     onLoad() {
         // // 1. 先找到 SHOW_ALL 模式适配之后，本节点的实际宽高以及初始缩放值
-        // var srcScaleForShowAll = Math.min(cc.view.getCanvasSize().width / this.node.width, cc.view.getCanvasSize().height / this.node.height);
-        // var realWidth = this.node.width * srcScaleForShowAll;
-        // var realHeight = this.node.height * srcScaleForShowAll;
+        // let srcScaleForShowAll = Math.min(cc.view.getCanvasSize().width / this.node.width, cc.view.getCanvasSize().height / this.node.height);
+        // let realWidth = this.node.width * srcScaleForShowAll;
+        // let realHeight = this.node.height * srcScaleForShowAll;
 
         // // 2. 基于第一步的数据，再做缩放适配
         // this.node.scale = Math.max(cc.view.getCanvasSize().width / realWidth, cc.view.getCanvasSize().height / realHeight);
@@ -48,10 +48,10 @@ cc.Class({
         // 0、居中（居中其实不需要挂这个脚本，浪费效率）
         // 1、宽高都根据高度拉伸
         // 2、长边充满
-        var cvs = cc.find('Canvas').getComponent(cc.Canvas);
-        var size = cc.view.getFrameSize();
+        let cvs = cc.find('Canvas').getComponent(cc.Canvas);
+        let size = cc.view.getFrameSize();
         //
-        var scaleMethod = this.scaleMethod;
+        let scaleMethod = this.scaleMethod;
         if (scaleMethod == 1) {
             if (cvs.fitWidth) {
                 this.node.height = this.node.width / size.width * size.height;
@@ -62,12 +62,12 @@ cc.Class({
         }
         else if (scaleMethod == 2) {
             if (cvs.fitWidth) {
-                var oldHeight = this.node.height;
+                let oldHeight = this.node.height;
                 this.node.height = this.node.width / size.width * size.height;
                 this.node.width = this.node.height / oldHeight * this.node.width;
             }
             else {
-                var oldWidth = this.node.width;
+                let oldWidth = this.node.width;
                 this.node.width = this.node.height / size.height * size.width;
                 this.node.height = this.node.width / oldWidth * this.node.height;
             }

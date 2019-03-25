@@ -66,7 +66,7 @@ cc.Class({
     },
 
     flop: function () {
-        // var act;
+        // let act;
         // if(this.node.scaleX === 1) {
         //     act = cc.scaleTo(0.5, -1, 1);
         // } else {
@@ -79,7 +79,7 @@ cc.Class({
         if (this.node.rotationY === 360) {
             this.node.rotationY = 0;
         }
-        var seq;
+        let seq;
         if (this.node.rotationY === 0) {
             seq = cc.sequence(cc.rotateTo(0.5, 0, 180), cc.callFunc(this.flopCallback, this));
         } else {

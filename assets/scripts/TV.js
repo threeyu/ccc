@@ -39,6 +39,15 @@ const tv = module.exports = {
         return cc.pSub(node.parent.convertToWorldSpaceAR(node.position), cc.p(cc.winSize.width / 2, cc.winSize.height / 2));
     },
 
+    emit: function (node) {
+        if (!node) {
+            console.warn(this._TAG + ' emit param error!');
+            return;
+        }
+        let pos = this.convertPos(node);
+        this.customEvent.emit('cursor', { pos });
+    },
+
     /**
      * 存储可以触摸的节点
      * @param {cc.Node} node 保存当前节点
@@ -60,17 +69,17 @@ const tv = module.exports = {
      * @param {cc.Node} node 
      */
     removeTouchByNode: function (node) {
-        if(!node) {
+        if (!node) {
             console.warn(this._TAG + ' removeTouchByNode param error! ' + node);
             return;
         }
-        for(let i = 0; i < this[this.curStatus + 'List'].length; ++i) {
-            if(this[this.curStatus + 'List'][i] === node) {
+        for (let i = 0; i < this[this.curStatus + 'List'].length; ++i) {
+            if (this[this.curStatus + 'List'][i] === node) {
                 this[this.curStatus + 'List'].splice(i, 1);
                 break;
             }
         }
-        if(this[this.curStatus + 'Count'] >= this[this.curStatus + 'List'].length) {
+        if (this[this.curStatus + 'Count'] >= this[this.curStatus + 'List'].length) {
             this[this.curStatus + 'Count'] = 0;
         }
         console.log(this[this.curStatus + 'List'].length + ',' + this[this.curStatus + 'Count']);

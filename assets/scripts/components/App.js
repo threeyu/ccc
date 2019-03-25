@@ -15,11 +15,11 @@ function initMgr() {
     cc.vv.tv = require('TV');
 
 
-    var TVKeyboardMgr = require('TVKeyboardMgr');
+    let TVKeyboardMgr = require('TVKeyboardMgr');
     cc.vv.tvKeyboardMgr = new TVKeyboardMgr();
 
 
-    var Utils = require('Utils');
+    let Utils = require('Utils');
     cc.vv.utils = new Utils();
 }
 
@@ -43,19 +43,10 @@ cc.Class({
         //     }
         // },
 
-        btn_1: {
-            type: cc.Node,
-            default: null,
+        btnList: {
+            type: [cc.Node],
+            default: [],
         },
-        btn_2: {
-            type: cc.Node,
-            default: null,
-        },
-        btn_3: {
-            type: cc.Node,
-            default: null,
-        },
-
         waitInfo: {
             type: cc.Node,
             default: null,
@@ -73,49 +64,72 @@ cc.Class({
         initMgr();
         cc.vv.utils.setFitSreenMode();
 
+
+        this.init();
+        this.addEvent();
+    },
+
+    init: function () {
+        // tv 遥控器
+        this.node.className = 'App';
+        this._tv = cc.vv.tv;
+        this._tv.reset(this._tv.status.start);
+
+        // 进度条
         this.waitInfo.active = false;
         this.txtProgress.string = '0%';
-
-        this.addEvent();
     },
 
     // start() {},
 
     // update (dt) {},
 
-
-    onBtnClickHandler: function (e) {
-        var id = e.currentTarget.name.split('_')[1];
+    gotoGame(id) {
         cc.vv.global.lvl = id;
         console.log('home: ' + id);
 
         // cc.textureCache.dumpCachedTextureInfo();
-        cc.director.loadScene('game_scene');
+        // cc.director.loadScene('game_scene');
 
 
         // this.waitInfo.active = true;
         // cc.loader.onProgress = function (completedCount, totalCount, item) {
         //     // console.log("completedCount:" + completedCount + ",totalCount:" + totalCount);
-        //     var per = Math.floor(completedCount * 100 / totalCount);
+        //     let per = Math.floor(completedCount * 100 / totalCount);
         //     this.txtProgress.string = per + "%";
         // }.bind(this);
 
-        // cc.director.preloadScene('game_scene', function () {
-        //     cc.loader.onProgress = null;
-        //     cc.director.loadScene('game_scene');
-        // });
+        cc.director.preloadScene('game_scene', function () {
+            // cc.loader.onProgress = null;
+            cc.director.loadScene('game_scene');
+        });
+    },
+
+    onBtnClickHandler: function (e) {
+        let id = e.currentTarget.name.split('_')[1];
+        this.gotoGame(id);
+    },
+
+    onKeyBHandler: function (e) {
+        let id = e + 1;
+        this.gotoGame(id);
     },
 
     addEvent: function () {
-        this.btn_1.on(cc.Node.EventType.TOUCH_END, this.onBtnClickHandler, this);
-        this.btn_2.on(cc.Node.EventType.TOUCH_END, this.onBtnClickHandler, this);
-        this.btn_3.on(cc.Node.EventType.TOUCH_END, this.onBtnClickHandler, this);
+        for (let i = 0; i < 3; ++i) {
+            this.btnList[i].on(cc.Node.EventType.TOUCH_END, this.onBtnClickHandler, this);
+
+            this._tv.addTouchToList(this.btnList[i], this.node, 'start_' + i, 'onKeyBHandler', i);
+        }
+        this._tv.emit(this._tv[this._tv.curStatus + 'List'][0]);
     },
 
     removeEvent: function () {
-        this.btn_1.off(cc.Node.EventType.TOUCH_END, this.onBtnClickHandler, this);
-        this.btn_2.off(cc.Node.EventType.TOUCH_END, this.onBtnClickHandler, this);
-        this.btn_3.off(cc.Node.EventType.TOUCH_END, this.onBtnClickHandler, this);
+        for (let i = 0; i < 3; ++i) {
+            this.btnList[i].off(cc.Node.EventType.TOUCH_END, this.onBtnClickHandler, this);
+
+            this._tv.removeTouchByNode(this.btnList[i]);
+        }
     },
 
     onDestroy() {

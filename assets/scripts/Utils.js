@@ -18,24 +18,24 @@ cc.Class({
     // 模拟点击事件
     addClickEvent: function (node, target, component, onHandler) {
         console.log(component + ': ' + onHandler);
-        var eventHandler = new cc.Component.EventHandler();
+        let eventHandler = new cc.Component.EventHandler();
         eventHandler.target = target;
         eventHandler.component = component;
         eventHandler.handler = onHandler;
 
-        var clickEvents = node.getComponent(cc.Button).clickEvents;
+        let clickEvents = node.getComponent(cc.Button).clickEvents;
         clickEvents.push(eventHandler);
     },
 
     // 内容适配
     setFitSreenMode: function () {
-        var size = cc.view.getFrameSize();
-        var fw = size.width;
-        var fh = size.height;
+        let size = cc.view.getFrameSize();
+        let fw = size.width;
+        let fh = size.height;
 
-        var cvs = cc.find('Canvas').getComponent(cc.Canvas);
-        var dw = cvs.designResolution.width;
-        var dh = cvs.designResolution.height;
+        let cvs = cc.find('Canvas').getComponent(cc.Canvas);
+        let dw = cvs.designResolution.width;
+        let dh = cvs.designResolution.height;
 
         if ((fw / fh) > (dw / dh)) {
             // 如果更宽 则让高显示满

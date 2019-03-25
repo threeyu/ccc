@@ -52,12 +52,11 @@ cc.Class({
         cc.vv.utils.setFitSreenMode();
 
 
-        this.initData();
-    },
-
-    start() {
+        this.init();
         this.setup();
     },
+
+    // start() { },
 
     // update (dt) {},
 
@@ -67,19 +66,19 @@ cc.Class({
         this.updateScore(true, false);
 
 
-        var delay = this._delayList[this._lvl - 1];;
-        var handl = setTimeout(this.gameStart.bind(this), delay);
+        let delay = this._delayList[this._lvl - 1];;
+        let handl = setTimeout(this.gameStart.bind(this), delay);
         this._timeHandleList.push(handl);
     },
 
     chaosSort: function () {
-        var len = this._showList[this._lvl - 1];
-        for (var i = 0, rand; i < len; ++i) {
+        let len = this._showList[this._lvl - 1];
+        for (let i = 0, rand; i < len; ++i) {
             this._cardList[i].active = true;
 
             rand = Math.floor(Math.random() * (len - 1));
-            var tmpx = this._cardList[i].x;
-            var tmpy = this._cardList[i].y;
+            let tmpx = this._cardList[i].x;
+            let tmpy = this._cardList[i].y;
             this._cardList[i].x = this._cardList[rand].x;
             this._cardList[i].y = this._cardList[rand].y;
             this._cardList[rand].x = tmpx;
@@ -87,7 +86,7 @@ cc.Class({
         }
     },
 
-    initData: function () {
+    init: function () {
         this._lvl = cc.vv.global.lvl;
         this._score = cc.vv.global.score;
         this._itemNum = 20;
@@ -105,19 +104,26 @@ cc.Class({
         this.menuScore.string = this._score + '';
 
 
+        // tv 遥控器
+        this.node.className = 'Game';
+        this._tv = cc.vv.tv;
+        this._tv.reset(this._tv.status.choose);
+        this._keybList = [];// 用于存储当前能活动的按钮
+
+
         this.createCard();
     },
 
     createCard: function () {
-        var self = this;
+        let self = this;
         cc.loader.loadRes('prefabs/card', cc.Prefab, function (err, res) {
-            for (var i = 0; i < self._itemNum; ++i) {
-                var card = cc.instantiate(res);
+            for (let i = 0; i < self._itemNum; ++i) {
+                let card = cc.instantiate(res);
                 self._cardList.push(card);
             }
 
 
-            var key = self._lvl - 1;
+            let key = self._lvl - 1;
             self.showitem(self._showList[key], key);
 
             self.chaosSort();// 乱序
@@ -128,10 +134,10 @@ cc.Class({
     },
 
     showitem: function (type, mode) {
-        var w = this._cardList[0].width + 8;
-        var h = this._cardList[0].height + 8;
-        var i = 0;
-        var cardNode, card;
+        let w = this._cardList[0].width + 8;
+        let h = this._cardList[0].height + 8;
+        let i = 0;
+        let cardNode, card;
 
         switch (type) {
             case 6:
@@ -194,10 +200,10 @@ cc.Class({
     },
 
     checkWin: function () {
-        var winCnt = this._showList[this._lvl - 1];
-        var doneCnt = 0;
-        for (var i = 0; i < winCnt; ++i) {
-            var cardComp = this._cardList[i].getComponent('Card');
+        let winCnt = this._showList[this._lvl - 1];
+        let doneCnt = 0;
+        for (let i = 0; i < winCnt; ++i) {
+            let cardComp = this._cardList[i].getComponent('Card');
             if (cardComp.curId !== 0) {
                 doneCnt++;
             }
@@ -209,19 +215,32 @@ cc.Class({
 
             this.overPanel.active = true;
             this.overScore.string = this._score + '';
-            var bg = this.overPanel.getChildByName('bg');
+            let bg = this.overPanel.getChildByName('bg');
             bg.y = 300;
-            var act = cc.moveTo(0.5, cc.p(0, 0));
+            let act = cc.moveTo(0.5, cc.p(0, 0));
             bg.runAction(act);
         }
     },
 
     hideCards: function () {
-        var key = this._lvl - 1;
-        for (var i = 0; i < this._showList[key]; ++i) {
-            var card = this._cardList[i];
+        // hide all cards
+        let key = this._lvl - 1;
+        for (let i = 0; i < this._showList[key]; ++i) {
+            let card = this._cardList[i];
             card.active = false;
         }
+
+
+        // remove keyctrl
+        this.removeKeyBListen();
+
+
+        // over add keyctrl
+        this._tv.addTouchToList(this.btn_over_again, this.node, 'game_again', 'onAgainHandler');
+        this._tv.addTouchToList(this.btn_over_home, this.node, 'game_home', 'onHomeHandler');
+        this._keybList.push(this.btn_over_again);
+        this._keybList.push(this.btn_over_home);
+        this._tv.emit(this._tv[this._tv.curStatus + 'List'][0]);
     },
 
     flopOne: function (cardComp) {
@@ -231,12 +250,12 @@ cc.Class({
     },
 
     onCardDownHandler: function (e) {
-        var self = this;
+        let self = this;
         if (self._canClick === false) {
             return;
         }
 
-        var cardcomp = e.currentTarget.getComponent('Card');
+        let cardcomp = e.currentTarget.getComponent('Card');
         if (cardcomp.mouseEnabled === false) {
             return;
         }
@@ -244,8 +263,8 @@ cc.Class({
         self._curCard = e.currentTarget;
         if (self._preCard !== null && self._preCard !== self._curCard) {
             self._canClick = false;
-            var pCardComp = self._preCard.getComponent('Card');
-            var cCardComp = self._curCard.getComponent('Card');
+            let pCardComp = self._preCard.getComponent('Card');
+            let cCardComp = self._curCard.getComponent('Card');
             self.flopOne(pCardComp);
             self.flopOne(cCardComp);
 
@@ -256,11 +275,11 @@ cc.Class({
                 self._preCard = null;
                 self._curCard = null;
                 self.updateScore(false, true);
-                var handl = setTimeout(self.checkWin.bind(self), 800);
+                let handl = setTimeout(self.checkWin.bind(self), 800);
                 self._timeHandleList.push(handl);
             } else {
                 self.updateScore(false, false);
-                var handl = setTimeout(function () {
+                let handl = setTimeout(function () {
                     self._canClick = true;
                     self.flopOne(pCardComp);
                     self.flopOne(cCardComp);
@@ -275,7 +294,7 @@ cc.Class({
     },
 
     onHomeHandler: function (e) {
-        var id = cc.vv.global.lvl;
+        let id = cc.vv.global.lvl;
         console.log('game: ' + id);
 
         // cc.textureCache.dumpCachedTextureInfo();
@@ -283,45 +302,66 @@ cc.Class({
     },
 
     onAgainHandler: function (e) {
+        // remove keyctrl
+        this.removeKeyBListen();
+
         this.chaosSort();// 乱序
         this.setup();
     },
 
     flopCards: function () {
-        var key = this._lvl - 1;
-        for (var i = 0; i < this._showList[key]; ++i) {
-            var cardComp = this._cardList[i].getComponent('Card');
+        let key = this._lvl - 1;
+        for (let i = 0; i < this._showList[key]; ++i) {
+            let cardComp = this._cardList[i].getComponent('Card');
             cardComp.flop();
             cardComp.mouseEnabled = true;
         }
     },
 
     clearTime: function () {
-        for (var i = 0; i < this._timeHandleList.length; ++i) {
+        for (let i = 0; i < this._timeHandleList.length; ++i) {
             clearTimeout(this._timeHandleList[i]);
             this._timeHandleList[i] = null;
         }
         this._timeHandleList.splice(0, this._timeHandleList.length);
     },
 
+    removeKeyBListen: function () {
+        let keyLen = this._keybList.length;
+        console.log(keyLen);
+        if (keyLen > 0) {
+            for (let j = 0; j < this._keybList.length; ++j) {
+                this._tv.removeTouchByNode(this._keybList[j]);
+            }
+            this._keybList.splice(0, this._keybList.length);
+        }
+    },
+
     addEvent: function () {
-        for (var i = 0; i < this._cardList.length; ++i) {
+        for (let i = 0; i < this._cardList.length; ++i) {
             this._cardList[i].on(cc.Node.EventType.TOUCH_END, this.onCardDownHandler, this);
         }
-
         this.btn_home.on(cc.Node.EventType.TOUCH_END, this.onHomeHandler, this);
         this.btn_over_home.on(cc.Node.EventType.TOUCH_END, this.onHomeHandler, this);
         this.btn_over_again.on(cc.Node.EventType.TOUCH_END, this.onAgainHandler, this);
+
+
+        this._tv.addTouchToList(this.btn_home, this.node, 'game_homt', 'onHomeHandler');
+        this._keybList.push(this.btn_home);
+        this._tv.emit(this._tv[this._tv.curStatus + 'List'][0]);
     },
 
     removeEvent: function () {
-        for (var i = 0; i < this._cardList.length; ++i) {
+        for (let i = 0; i < this._cardList.length; ++i) {
             this._cardList[i].off(cc.Node.EventType.TOUCH_END, this.onCardDownHandler, this);
         }
-
         this.btn_home.off(cc.Node.EventType.TOUCH_END, this.onHomeHandler, this);
         this.btn_over_home.off(cc.Node.EventType.TOUCH_END, this.onHomeHandler, this);
         this.btn_over_again.off(cc.Node.EventType.TOUCH_END, this.onAgainHandler, this);
+
+
+        // remove keyctrl
+        this.removeKeyBListen();
     },
 
     onDestroy() {
