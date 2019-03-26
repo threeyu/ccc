@@ -54,9 +54,10 @@ cc.Class({
 
         this.init();
         this.setup();
+        this.addEvent();
     },
 
-    // start() { },
+    // start() {},
 
     // update (dt) {},
 
@@ -69,6 +70,11 @@ cc.Class({
         let delay = this._delayList[this._lvl - 1];;
         let handl = setTimeout(this.gameStart.bind(this), delay);
         this._timeHandleList.push(handl);
+
+        // add key ctrl
+        this._tv.addTouchToList(this.btn_home, this.node, 'game_home', 'onHomeHandler');
+        this._keybList.push(this.btn_home);
+        this._tv.emit(this._tv[this._tv.curStatus + 'List'][0]);
     },
 
     chaosSort: function () {
@@ -99,6 +105,7 @@ cc.Class({
         this._preCard = null;
         this._curCard = null;
         this._canClick = false;
+        this._cardURL = 'prefabs/card';
 
 
         this.menuScore.string = this._score + '';
@@ -116,7 +123,7 @@ cc.Class({
 
     createCard: function () {
         let self = this;
-        cc.loader.loadRes('prefabs/card', cc.Prefab, function (err, res) {
+        cc.loader.loadRes(this._cardURL, cc.Prefab, function (err, res) {
             for (let i = 0; i < self._itemNum; ++i) {
                 let card = cc.instantiate(res);
                 self._cardList.push(card);
@@ -129,7 +136,7 @@ cc.Class({
             self.chaosSort();// 乱序
 
             // 添加事件
-            self.addEvent();
+            self.addCardEvent();
         });
     },
 
@@ -328,27 +335,24 @@ cc.Class({
 
     removeKeyBListen: function () {
         let keyLen = this._keybList.length;
-        console.log(keyLen);
         if (keyLen > 0) {
-            for (let j = 0; j < this._keybList.length; ++j) {
-                this._tv.removeTouchByNode(this._keybList[j]);
+            for (let i = 0; i < keyLen; ++i) {
+                this._tv.removeTouchByNode(this._keybList[i]);
             }
-            this._keybList.splice(0, this._keybList.length);
+            this._keybList.splice(0, keyLen);
+        }
+    },
+
+    addCardEvent: function () {
+        for (let i = 0; i < this._cardList.length; ++i) {
+            this._cardList[i].on(cc.Node.EventType.TOUCH_END, this.onCardDownHandler, this);
         }
     },
 
     addEvent: function () {
-        for (let i = 0; i < this._cardList.length; ++i) {
-            this._cardList[i].on(cc.Node.EventType.TOUCH_END, this.onCardDownHandler, this);
-        }
         this.btn_home.on(cc.Node.EventType.TOUCH_END, this.onHomeHandler, this);
         this.btn_over_home.on(cc.Node.EventType.TOUCH_END, this.onHomeHandler, this);
         this.btn_over_again.on(cc.Node.EventType.TOUCH_END, this.onAgainHandler, this);
-
-
-        this._tv.addTouchToList(this.btn_home, this.node, 'game_homt', 'onHomeHandler');
-        this._keybList.push(this.btn_home);
-        this._tv.emit(this._tv[this._tv.curStatus + 'List'][0]);
     },
 
     removeEvent: function () {
@@ -367,6 +371,7 @@ cc.Class({
     onDestroy() {
         this.clearTime();
         this.removeEvent();
+        cc.loader.releaseRes(this._cardURL, cc.Prefab);
     }
 
 

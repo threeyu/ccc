@@ -775,8 +775,8 @@
     "_scaleY": 1,
     "_position": {
       "__type__": "cc.Vec2",
-      "x": -302,
-      "y": -52
+      "x": -300,
+      "y": -42
     },
     "_skewX": 0,
     "_skewY": 0,

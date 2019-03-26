@@ -15,8 +15,8 @@ function initMgr() {
     cc.vv.tv = require('TV');
 
 
-    let TVKeyboardMgr = require('TVKeyboardMgr');
-    cc.vv.tvKeyboardMgr = new TVKeyboardMgr();
+    // let TVKeyboardMgr = require('TVKeyboardMgr');
+    // cc.vv.tvKeyboardMgr = new TVKeyboardMgr();
 
 
     let Utils = require('Utils');
@@ -119,9 +119,9 @@ cc.Class({
         for (let i = 0; i < 3; ++i) {
             this.btnList[i].on(cc.Node.EventType.TOUCH_END, this.onBtnClickHandler, this);
 
-            this._tv.addTouchToList(this.btnList[i], this.node, 'start_' + i, 'onKeyBHandler', i);
+            this._tv.addTouchToList(this.btnList[i], this.node, 'app_btn_' + i, 'onKeyBHandler', i);
         }
-        this._tv.emit(this._tv[this._tv.curStatus + 'List'][0]);
+        // this._tv.emit(this._tv[this._tv.curStatus + 'List'][0]);
     },
 
     removeEvent: function () {
