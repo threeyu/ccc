@@ -435,7 +435,7 @@
     "node": {
       "__id__": 6
     },
-    "_enabled": false,
+    "_enabled": true,
     "isAlignOnce": true,
     "_target": null,
     "_alignFlags": 10,
@@ -664,7 +664,7 @@
     "node": {
       "__id__": 12
     },
-    "_enabled": false,
+    "_enabled": true,
     "isAlignOnce": true,
     "_target": null,
     "_alignFlags": 34,
@@ -1341,8 +1341,8 @@
     "_scaleY": 1,
     "_position": {
       "__type__": "cc.Vec2",
-      "x": 433,
-      "y": 2
+      "x": 429,
+      "y": 0
     },
     "_skewX": 0,
     "_skewY": 0,

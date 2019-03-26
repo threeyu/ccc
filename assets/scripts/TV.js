@@ -82,7 +82,7 @@ const tv = module.exports = {
         if (this[this.curStatus + 'Count'] >= this[this.curStatus + 'List'].length) {
             this[this.curStatus + 'Count'] = 0;
         }
-        console.log(this[this.curStatus + 'List'].length + ',' + this[this.curStatus + 'Count']);
+        // console.log(this[this.curStatus + 'List'].length + ',' + this[this.curStatus + 'Count']);
     },
 
 };

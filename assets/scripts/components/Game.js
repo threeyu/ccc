@@ -55,42 +55,17 @@ cc.Class({
         this.init();
         this.setup();
         this.addEvent();
+
+
+        this.btnhomeCallback = function () {
+            this._tv.emit(this._tv[this._tv.curStatus + 'List'][0]);
+        }
+        this.scheduleOnce(this.btnhomeCallback, 0.01);
     },
 
     // start() {},
 
     // update (dt) {},
-
-    setup: function () {
-        this.overPanel.active = false;
-        this.clearTime();
-        this.updateScore(true, false);
-
-
-        let delay = this._delayList[this._lvl - 1];;
-        let handl = setTimeout(this.gameStart.bind(this), delay);
-        this._timeHandleList.push(handl);
-
-        // add key ctrl
-        this._tv.addTouchToList(this.btn_home, this.node, 'game_home', 'onHomeHandler');
-        this._keybList.push(this.btn_home);
-        this._tv.emit(this._tv[this._tv.curStatus + 'List'][0]);
-    },
-
-    chaosSort: function () {
-        let len = this._showList[this._lvl - 1];
-        for (let i = 0, rand; i < len; ++i) {
-            this._cardList[i].active = true;
-
-            rand = Math.floor(Math.random() * (len - 1));
-            let tmpx = this._cardList[i].x;
-            let tmpy = this._cardList[i].y;
-            this._cardList[i].x = this._cardList[rand].x;
-            this._cardList[i].y = this._cardList[rand].y;
-            this._cardList[rand].x = tmpx;
-            this._cardList[rand].y = tmpy;
-        }
-    },
 
     init: function () {
         this._lvl = cc.vv.global.lvl;
@@ -121,6 +96,22 @@ cc.Class({
         this.createCard();
     },
 
+    setup: function () {
+        this.overPanel.active = false;
+        this.clearTime();
+        this.updateScore(true, false);
+
+
+        let delay = this._delayList[this._lvl - 1];;
+        let handl = setTimeout(this.gameStart.bind(this), delay);
+        this._timeHandleList.push(handl);
+
+        // add key ctrl
+        this._tv.addTouchToList(this.btn_home, this.node, 'game_home', 'onHomeHandler');
+        this._keybList.push(this.btn_home);
+        this._tv.emit(this._tv[this._tv.curStatus + 'List'][0]);
+    },
+
     createCard: function () {
         let self = this;
         cc.loader.loadRes(this._cardURL, cc.Prefab, function (err, res) {
@@ -138,6 +129,22 @@ cc.Class({
             // 添加事件
             self.addCardEvent();
         });
+    },
+
+    chaosSort: function () {
+        let len = this._showList[this._lvl - 1];
+        for (let i = 0, rand; i < len; ++i) {
+            this._cardList[i].active = true;
+            rand = Math.floor(Math.random() * (len - 1));
+            let tmpCard = this._cardList[i].getComponent('Card');
+            let randCard = this._cardList[rand].getComponent('Card');
+            let tmpId = tmpCard.curId;
+            tmpCard.curId = randCard.curId;
+            randCard.curId = tmpId;
+
+            this._tv.addTouchToList(this._cardList[i], this.node, 'game_card_' + i, 'onKeybCardHandler', i);
+            this._keybList.push(this._cardList[i]);
+        }
     },
 
     showitem: function (type, mode) {
@@ -222,10 +229,10 @@ cc.Class({
 
             this.overPanel.active = true;
             this.overScore.string = this._score + '';
-            let bg = this.overPanel.getChildByName('bg');
-            bg.y = 300;
-            let act = cc.moveTo(0.5, cc.p(0, 0));
-            bg.runAction(act);
+            // let bg = this.overPanel.getChildByName('bg');
+            // bg.y = 300;
+            // let act = cc.moveTo(0.5, cc.p(0, 0));
+            // bg.runAction(act);
         }
     },
 
@@ -256,18 +263,20 @@ cc.Class({
         }
     },
 
-    onCardDownHandler: function (e) {
+    // 选择卡片逻辑
+    runCardLogicById: function(id) {
         let self = this;
         if (self._canClick === false) {
             return;
         }
 
-        let cardcomp = e.currentTarget.getComponent('Card');
+        let item = self._cardList[id];
+        let cardcomp = item.getComponent('Card');
         if (cardcomp.mouseEnabled === false) {
             return;
         }
 
-        self._curCard = e.currentTarget;
+        self._curCard = item;
         if (self._preCard !== null && self._preCard !== self._curCard) {
             self._canClick = false;
             let pCardComp = self._preCard.getComponent('Card');
@@ -298,6 +307,15 @@ cc.Class({
             return;
         }
         self._preCard = self._curCard;
+    },
+
+    onKeybCardHandler: function(id) {
+        this.runCardLogicById(id);
+    },
+
+    onCardDownHandler: function (e) {
+        let id = this._cardList.indexOf(e.currentTarget);
+        this.runCardLogicById(id);
     },
 
     onHomeHandler: function (e) {
@@ -331,6 +349,9 @@ cc.Class({
             this._timeHandleList[i] = null;
         }
         this._timeHandleList.splice(0, this._timeHandleList.length);
+
+        
+        this.unschedule(this.btnhomeCallback);
     },
 
     removeKeyBListen: function () {
