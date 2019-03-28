@@ -53,14 +53,7 @@ cc.Class({
 
 
         this.init();
-        this.setup();
         this.addEvent();
-
-
-        this.btnhomeCallback = function () {
-            this._tv.emit(this._tv[this._tv.curStatus + 'List'][0]);
-        }
-        this.scheduleOnce(this.btnhomeCallback, 0.01);
     },
 
     // start() {},
@@ -105,11 +98,6 @@ cc.Class({
         let delay = this._delayList[this._lvl - 1];;
         let handl = setTimeout(this.gameStart.bind(this), delay);
         this._timeHandleList.push(handl);
-
-        // add key ctrl
-        this._tv.addTouchToList(this.btn_home, this.node, 'game_home', 'onHomeHandler');
-        this._keybList.push(this.btn_home);
-        this._tv.emit(this._tv[this._tv.curStatus + 'List'][0]);
     },
 
     createCard: function () {
@@ -120,12 +108,12 @@ cc.Class({
                 self._cardList.push(card);
             }
 
-
             let key = self._lvl - 1;
             self.showitem(self._showList[key], key);
 
+            
             self.chaosSort();// 乱序
-
+            self.setup();
             // 添加事件
             self.addCardEvent();
         });
@@ -145,6 +133,12 @@ cc.Class({
             this._tv.addTouchToList(this._cardList[i], this.node, 'game_card_' + i, 'onKeybCardHandler', i);
             this._keybList.push(this._cardList[i]);
         }
+
+        // add key ctrl on btn_home
+        this._tv.addTouchToList(this.btn_home, this.node, 'game_home', 'onHomeHandler');
+        this._keybList.push(this.btn_home);
+        this._tv.emit(this._tv[this._tv.curStatus + 'List'][0]);
+        
     },
 
     showitem: function (type, mode) {
@@ -349,9 +343,6 @@ cc.Class({
             this._timeHandleList[i] = null;
         }
         this._timeHandleList.splice(0, this._timeHandleList.length);
-
-        
-        this.unschedule(this.btnhomeCallback);
     },
 
     removeKeyBListen: function () {
